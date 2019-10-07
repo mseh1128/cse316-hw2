@@ -4,9 +4,9 @@ import ListItemCard from './ListItemCard';
 export class ListItemsTable extends Component {
   render() {
     console.log('IN ITEMS TABLE');
-    console.log(this.props.removeItem);
+    // console.log(`Move down btn: ${this.props.moveDownBtn}`);
     const finalItemIdx = this.props.todoList.items.length - 1;
-    const testArray = this.props.todoList.items.map((todoItem, idx) => {
+    const todoListItems = this.props.todoList.items.map((todoItem, idx) => {
       let upDisabled = false;
       let downDisabled = false;
       if (idx === 0) upDisabled = true;
@@ -18,6 +18,8 @@ export class ListItemsTable extends Component {
           upDisabled={upDisabled}
           downDisabled={downDisabled}
           removeItem={this.props.removeItem}
+          moveUpBtn={this.props.moveUpBtn}
+          moveDownBtn={this.props.moveDownBtn}
         />
       );
     });
@@ -26,14 +28,14 @@ export class ListItemsTable extends Component {
         <div className="list_item_header_card">
           <div
             className="list_item_task_header"
-            onClick={() => this.props.sortByTask()}
+            onClick={() => this.props.sortTasksHeader("task")}
           >
             Task
           </div>
-          <div className="list_item_due_date_header">Due Date</div>
-          <div className="list_item_status_header">Status</div>
+          <div className="list_item_due_date_header" onClick={() => this.props.sortTasksHeader("due_date")}>Due Date</div>
+          <div className="list_item_status_header" onClick={() => this.props.sortTasksHeader("status")}>Status</div>
         </div>
-        {testArray}
+        {todoListItems}
       </div>
     );
   }

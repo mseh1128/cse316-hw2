@@ -9,7 +9,7 @@ export class ListItemCard extends Component {
     // console.log(this.props.listItem);
     // console.log(this.props.upDisabled);
     // console.log(this.props.downDisabled);
-    const { listItem, upDisabled, downDisabled, removeItem } = this.props;
+    const { listItem, upDisabled, downDisabled, removeItem, moveUpBtn, moveDownBtn} = this.props;
     const completedDiv = listItem.completed ? (
       <div className="list_item_card_completed">Completed</div>
     ) : (
@@ -20,6 +20,7 @@ export class ListItemCard extends Component {
         src={moveUpIcon}
         alt="Up Button"
         className={`list_item_up_btn ${upDisabled ? 'disabled' : null}`}
+        onClick={() => moveUpBtn(listItem)}
       />
     );
     const downButton = (
@@ -27,6 +28,7 @@ export class ListItemCard extends Component {
         src={moveDownIcon}
         alt="Down Button"
         className={`list_item_down_btn ${downDisabled ? 'disabled' : null}`}
+        onClick={() => moveDownBtn(listItem)}
       />
     );
 
