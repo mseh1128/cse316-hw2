@@ -77,6 +77,7 @@ export class ListScreen extends Component {
           sortTasksHeader={this.props.sortTasksHeader}
           moveUpBtn={this.props.moveUpBtn}
           moveDownBtn={this.props.moveDownBtn}
+          goToItem={this.props.goToItem}
         />
       </div>
     );

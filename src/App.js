@@ -17,6 +17,8 @@ class App extends Component {
     currentList: null
   };
 
+  todoItem = null;
+
   taskAscending = true;
   dueDateAscending = true;
   statusAscending = true;
@@ -100,11 +102,44 @@ class App extends Component {
     this.setState({ currentList: null });
   };
 
+
+  goToItem = (todoItem) => {
+    this.todoItem = todoItem;
+    this.setState({ currentScreen: AppScreen.ITEM_SCREEN });
+  };
+
   loadList = todoListToLoad => {
     this.setState({ currentScreen: AppScreen.LIST_SCREEN });
     this.setState({ currentList: todoListToLoad });
     console.log('currentList: ' + this.state.currentList);
     console.log('currentScreen: ' + this.state.currentScreen);
+  };
+
+  loadListFromItem = () => {
+    this.setState({ currentScreen: AppScreen.LIST_SCREEN });
+    console.log('currentList: ' + this.state.currentList);
+    console.log('currentScreen: ' + this.state.currentScreen);
+  };
+
+  editItem = (updatedItemFields) => {
+    const {key, id} = this.todoItem;
+    const updatedTodoItem = {key, ...updatedItemFields};
+    // update it in current screen & todo list?
+    const currentListKey = this.state.currentList.key;
+    const updatedTodoList = this.state.todoLists.slice();
+    let todoListItem = updatedTodoList[currentListKey].items.find(x => x.id === id);
+    for(let value in updatedTodoItem) todoListItem[value]=updatedTodoItem[value];
+    /////////////////////
+    const updatedCurrentList = Object.assign({}, this.state.currentList);
+    let listItem = updatedCurrentList.items.find(x => x.id === id);
+    for(let value in updatedTodoItem) listItem[value]=updatedTodoItem[value];
+    this.setState({
+      todoLists: updatedTodoList,
+      currentList: updatedCurrentList
+    });
+    console.log(this.state.todoLists);
+    
+    this.loadListFromItem();
   };
 
   removeItem = todoListItem => {
@@ -113,9 +148,6 @@ class App extends Component {
     updatedTodoList[currentListKey].items = updatedTodoList[
       currentListKey
     ].items.filter(e1 => e1.key !== todoListItem.key);
-    // updatedTodoList[currentListKey].items.forEach(
-      //   (item, idx) => (item.key = idx)
-      // );
     const updatedCurrentList = Object.assign({}, this.state.currentList);
     updatedCurrentList.items = updatedCurrentList.items.filter(e1 => e1.key !== todoListItem.key);
     this.setState({
@@ -166,6 +198,7 @@ class App extends Component {
         return (
           <ListScreen
             goHome={this.goHome.bind(this)}
+            goToItem={this.goToItem.bind(this)}
             todoList={this.state.currentList}
             removeItem={this.removeItem.bind(this)}
             sortTasksHeader={this.sortTasksHeader.bind(this)}
@@ -174,7 +207,12 @@ class App extends Component {
           />
         );
       case AppScreen.ITEM_SCREEN:
-        return <ItemScreen />;
+        return <ItemScreen currentScreen={this.state.currentScreen} 
+        todoItem={this.todoItem} 
+        loadListFromItem={this.loadListFromItem.bind(this)}
+        editItem={this.editItem.bind(this)}
+        
+        />;
       default:
         return <div>ERROR</div>;
     }

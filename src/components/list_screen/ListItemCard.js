@@ -9,7 +9,7 @@ export class ListItemCard extends Component {
     // console.log(this.props.listItem);
     // console.log(this.props.upDisabled);
     // console.log(this.props.downDisabled);
-    const { listItem, upDisabled, downDisabled, removeItem, moveUpBtn, moveDownBtn} = this.props;
+    const { listItem, upDisabled, downDisabled, removeItem, moveUpBtn, moveDownBtn, goToItem} = this.props;
     const completedDiv = listItem.completed ? (
       <div className="list_item_card_completed">Completed</div>
     ) : (
@@ -34,7 +34,7 @@ export class ListItemCard extends Component {
 
     return (
       <div className="new_item_div_container">
-        <div className="list_item_card">
+        <div onClick={() => goToItem(listItem)} className="list_item_card">
           <div className="list_item_card_description">
             {listItem.description}
           </div>

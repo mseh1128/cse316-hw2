@@ -21,7 +21,8 @@ body {
 /* SCREENS */
 #todo_home,
 #todo_list,
-#todo_item {
+#todo_item,
+#edit_item_container {
   background-color: var(--swatch-primary);
 }
 #todo_list {

@@ -20,6 +20,7 @@ export class ListItemsTable extends Component {
           removeItem={this.props.removeItem}
           moveUpBtn={this.props.moveUpBtn}
           moveDownBtn={this.props.moveDownBtn}
+          goToItem={this.props.goToItem}
         />
       );
     });

@@ -163,7 +163,7 @@ body {
 #item_heading {
 }
 #item_form_container {
-  display: grid;
+ 
 }
 #item_description_prompt {
 }
@@ -184,6 +184,36 @@ body {
 #item_form_submit_button {
 }
 #item_form_cancel_button {
+}
+
+#edit_item_container, .item_prompts {
+  font-weight: bold;
+}
+
+.item_form_values_container {
+  display: grid;
+  grid-template-columns: 1fr 7fr;
+}
+
+.item_field_container {
+  display: flex;
+  align-items: center;
+}
+
+.item_field_container input {
+  width: 100%;
+  height: 1.75em;
+}
+
+#item_completed_container input {
+  border-radius: 0.4em;
+  font-size:1.15em;
+  background-color: #f0f0f0;
+}
+
+#checkbox_field_container input {
+  transform: scale(1.5);
+  width: auto;
 }
 
 /* ITEM SCREEN CLASSES */
