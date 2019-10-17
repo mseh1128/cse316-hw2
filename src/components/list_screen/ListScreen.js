@@ -1,11 +1,10 @@
-import React, { Component } from 'react';
-import ListHeading from './ListHeading';
-import ListItemsTable from './ListItemsTable';
-import ListTrash from './ListTrash';
-import PropTypes from 'prop-types';
+import React, { Component } from "react";
+import ListHeading from "./ListHeading";
+import ListItemsTable from "./ListItemsTable";
+import PropTypes from "prop-types";
+import ListTrash from "./ListTrash";
 
 export class ListScreen extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -18,9 +17,7 @@ export class ListScreen extends Component {
   handleChange(event) {
     const target = event.target;
     const name = target.name;
-    console.log(`Name: ${name}`);
-    console.log(`targetValue: ${target.value}`)
-    this.setState({[name]: target.value});
+    this.setState({ [name]: target.value });
   }
 
   // handleNameSubmit(event) {
@@ -30,10 +27,9 @@ export class ListScreen extends Component {
 
   getListName() {
     if (this.props.todoList) {
-      console.log(this.props.todoList);
       let name = this.props.todoList.name;
       return this.props.todoList.name;
-    } else return '';
+    } else return "";
   }
 
   getListOwner() {
@@ -44,11 +40,11 @@ export class ListScreen extends Component {
   }
 
   render() {
-    const {listName, listOwner} = this.state;
+    const { listName, listOwner } = this.state;
     return (
       <div id="todo_list">
         <ListHeading goHome={() => this.props.goHome(listName, listOwner)} />
-        <ListTrash />
+        <ListTrash removeList={this.props.removeList} />
         <div id="list_details_container">
           <div id="list_details_name_container" className="text_toolbar">
             <span id="list_name_prompt">Name:</span>

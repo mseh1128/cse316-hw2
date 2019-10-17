@@ -163,7 +163,6 @@ body {
 #item_heading {
 }
 #item_form_container {
- 
 }
 #item_description_prompt {
 }
@@ -186,7 +185,8 @@ body {
 #item_form_cancel_button {
 }
 
-#edit_item_container, .item_prompts {
+#edit_item_container,
+.item_prompts {
   font-weight: bold;
 }
 
@@ -207,7 +207,7 @@ body {
 
 #item_completed_container input {
   border-radius: 0.4em;
-  font-size:1.15em;
+  font-size: 1.15em;
   background-color: #f0f0f0;
 }
 

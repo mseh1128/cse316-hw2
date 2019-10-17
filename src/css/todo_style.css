@@ -9,13 +9,13 @@
   --swatch-complement: #e1e4cb; /* USED IN FORGROUND OF PRIMARY FOR TEXT AND BORDERS */
   --swatch_contrast: #111111; /* USED IN MOUSE-OVER SELECTION OF LARGE ELEMENTS */
   --swatch-accent: #669966; /* USED IN MOUSE-OVER SELECTION OF TEXT AND BORDERS */
-  --my-font-family: 'Robaaaoto';
+  --my-font-family: "Robaaaoto";
   --bounceEasing: cubic-bezier(0.51, 0.92, 0.24, 1.15);
 }
 
 body {
   background-color: var(--swatch-foundation);
-  font-family: 'Lexend Exa';
+  font-family: "Lexend Exa";
 }
 
 /* SCREENS */
@@ -100,6 +100,7 @@ body {
   color: var(--swatch-accent);
   cursor: pointer;
 }
+
 #list_items_container {
 }
 
@@ -216,38 +217,82 @@ body {
   font-size: 16pt;
 }
 
-/* FOR A MODAL DIALOG */
+/* MY MODAL DIALOG IS EASIER */
 
-.modal {
+#modal_yes_no_dialog {
+  display: none;
   position: fixed;
-  top: 0;
+  z-index: 1;
   left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  background: var(--black);
-  cursor: pointer;
-  visibility: hidden;
-  opacity: 0;
-  transition: all 0.35s ease-in;
-}
-
-.modal.is_visible {
-  visibility: visible;
-  opacity: 1;
-}
-
-.modal_dialog {
-  position: relative;
-  max-width: 800px;
-  max-height: 80vh;
-  border-radius: 5px;
-  background: var(--swatch-complement);
+  top: 0;
+  width: 100%;
+  height: 100%;
   overflow: auto;
-  cursor: default;
+}
+
+.is_visible {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+}
+
+.slide_in_animation {
+  animation-duration: 3s;
+  animation-name: slidein;
+}
+
+@keyframes slidein {
+  from {
+    margin-left: 100%;
+    width: 300%;
+  }
+
+  to {
+    margin-left: 0%;
+    width: 100%;
+  }
+}
+
+#delete_text {
+  margin-top: 0px;
+}
+
+#delete_confirm_text {
+  font-weight: bold;
+  margin-top: 3em;
+  margin-bottom: 2em;
+}
+
+#yes_no_btns button {
+  height: 3em;
+}
+#delete_warning {
+  margin-bottom: 0.5em;
+}
+
+.modal_slide_out {
+  animation-duration: 3s !important;
+  animation-name: slideout !important;
+}
+
+@keyframes slideout {
+  from {
+    margin-left: 0%;
+    width: 100%;
+  }
+
+  to {
+    margin-left: 100%;
+    width: 300%;
+  }
+}
+
+/* Modal Content */
+.modal_content {
+  background-color: #e1e4cb;
+  margin: auto;
+  padding: 15px;
+  width: 30%;
 }
 
 /*CUSTOM VARIABLES HERE*/
@@ -275,6 +320,28 @@ body {
   margin-top: 1rem;
 }
 
+/* My Animations */
+
+.is_visible {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  animation-duration: 3s;
+  animation-name: slidein;
+}
+
+@keyframes slidein {
+  from {
+    margin-left: 100%;
+    width: 300%;
+  }
+
+  to {
+    margin-left: 0%;
+    width: 100%;
+  }
+}
+
 /* ANIMATIONS
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 [data-animation] .modal_dialog {
@@ -287,41 +354,41 @@ body {
   transition-delay: 0.2s;
 }
 
-[data-animation='slideInOutDown'] .modal_dialog {
+[data-animation="slideInOutDown"] .modal_dialog {
   transform: translateY(100%);
 }
 
-[data-animation='slideInOutTop'] .modal_dialog {
+[data-animation="slideInOutTop"] .modal_dialog {
   transform: translateY(-100%);
 }
 
-[data-animation='slideInOutLeft'] .modal_dialog {
+[data-animation="slideInOutLeft"] .modal_dialog {
   transform: translateX(-100%);
 }
 
-[data-animation='slideInOutRight'] .modal_dialog {
+[data-animation="slideInOutRight"] .modal_dialog {
   transform: translateX(100%);
 }
 
-[data-animation='zoomInOut'] .modal_dialog {
+[data-animation="zoomInOut"] .modal_dialog {
   transform: scale(0.2);
 }
 
-[data-animation='rotateInOutDown'] .modal_dialog {
+[data-animation="rotateInOutDown"] .modal_dialog {
   transform-origin: top left;
   transform: rotate(-1turn);
 }
 
-[data-animation='mixInAnimations'].is_visible .modal_dialog {
+[data-animation="mixInAnimations"].is_visible .modal_dialog {
   animation: mixInAnimations 2s 0.2s linear forwards;
 }
 
-[data-animation='slideInOutDown'].is_visible .modal_dialog,
-[data-animation='slideInOutTop'].is_visible .modal_dialog,
-[data-animation='slideInOutLeft'].is_visible .modal_dialog,
-[data-animation='slideInOutRight'].is_visible .modal_dialog,
-[data-animation='zoomInOut'].is_visible .modal_dialog,
-[data-animation='rotateInOutDown'].is_visible .modal_dialog {
+[data-animation="slideInOutDown"].is_visible .modal_dialog,
+[data-animation="slideInOutTop"].is_visible .modal_dialog,
+[data-animation="slideInOutLeft"].is_visible .modal_dialog,
+[data-animation="slideInOutRight"].is_visible .modal_dialog,
+[data-animation="zoomInOut"].is_visible .modal_dialog,
+[data-animation="rotateInOutDown"].is_visible .modal_dialog {
   transform: none;
 }
 
