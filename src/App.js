@@ -3,6 +3,8 @@ import testTodoListData from "./TestTodoListData.json";
 import HomeScreen from "./components/home_screen/HomeScreen";
 import ItemScreen from "./components/item_screen/ItemScreen";
 import ListScreen from "./components/list_screen/ListScreen";
+import jTPS from "./jtps/jTPS";
+import StrTransaction from "./jtps/AddToStr_Transaction"
 
 const AppScreen = {
   HOME_SCREEN: "HOME_SCREEN",
@@ -16,6 +18,8 @@ class App extends Component {
     todoLists: testTodoListData.todoLists,
     currentList: null
   };
+
+  transactionSystem = new jTPS();
 
   todoItem = null;
 
@@ -32,6 +36,64 @@ class App extends Component {
     }
     return 0;
   };
+
+  keys = {
+    ctrl: false,
+    z: false,
+    y: false
+  }
+
+  componentDidMount(){
+    document.addEventListener("keydown", this.handleKeyDown);
+    document.addEventListener("keyup", this.handleKeyUp);
+  }
+  
+  componentWillUnmount(){
+    document.removeEventListener("keydown", this.handleKeyUp);
+  }
+
+  handleKeyDown = (event) => {
+    if (event.keyCode === 90) {
+        this.keys["z"] = true;
+    } else if (event.keyCode === 17) {
+        this.keys["ctrl"] = true;
+    } else if(event.keyCode === 89) {
+        this.keys["y"] = true;
+    }
+    if (this.keys["z"] && this.keys["ctrl"]) {
+      console.log("Z AND CTRL WERE BOTH CLICKED AT THE SAME TIME ")
+      this.transactionSystem.undoTransaction();
+      // do something here! 
+    } else if(this.keys["y"] && this.keys["ctrl"]) {
+      console.log("Y AND CTRL WERE BOTH CLICKED AT THE SAME TIME ")
+      this.transactionSystem.redoTransaction();
+       // do something here!
+    } 
+  }
+
+  handleKeyUp = (event) => {
+    if (event.keyCode === 90) {
+      this.keys["z"] = false;
+    } else if (event.keyCode === 17) {
+      this.keys["ctrl"] = false;
+    }
+  }
+
+  addNameChangeTransaction = (oldStr, newStr) => {
+    const transaction = new StrTransaction(oldStr, newStr);
+    this.transactionSystem.addTransaction(transaction);
+    console.log(this.transactionSystem);
+  }
+
+  undoNameChangeTransaction = (oldStr, newStr) => {
+    const transaction = new StrTransaction(oldStr, newStr);
+    this.transactionSystem.addTransaction(transaction);
+  }
+
+  redoNameChangeTransaction = (oldStr, newStr) => {
+    const transaction = new StrTransaction(oldStr, newStr);
+    this.transactionSystem.addTransaction(transaction);
+  }
 
   dueDateSortComparator = (a, b) => {
     if (new Date(a.due_date) > new Date(b.due_date)) {
@@ -94,12 +156,12 @@ class App extends Component {
     const currentListKey = this.state.currentList.key;
     const updatedTodoList = this.state.todoLists.slice();
     const idxOfList = updatedTodoList.map(e => e.key).indexOf(currentListKey);
-    if (newName === "") {
+    if (newName === "" || newName === null) {
       updatedTodoList[idxOfList].name = "Unknown";
     } else {
       updatedTodoList[idxOfList].name = newName;
     }
-    if (newOwner === "") {
+    if (newOwner === "" || newName === null) {
       updatedTodoList[idxOfList].owner = "Unknown";
     } else {
       updatedTodoList[idxOfList].owner = newOwner;
@@ -126,32 +188,64 @@ class App extends Component {
 
   loadListFromItem = () => {
     this.setState({ currentScreen: AppScreen.LIST_SCREEN });
+    const currentListKey = this.state.currentList.key;
+    const idxOfList = this.state.todoLists.map(e => e.key).indexOf(currentListKey);
+    const currentListUpdated = this.state.todoLists[idxOfList];
+    this.setState({ currentList: currentListUpdated });
   };
 
-  editItem = updatedItemFields => {
-    const { key, id } = this.todoItem;
-    for (let field in updatedItemFields) {
-      if (field !== "completed" && updatedItemFields[field] == "")
-        updatedItemFields[field] = "Unknown";
-    }
-    const updatedTodoItem = { key, ...updatedItemFields };
-    // update it in current screen & todo list?
+
+  createNewItem = newItemFields => {
+    // requires currentlist to be defined
     const currentListKey = this.state.currentList.key;
     const updatedTodoList = this.state.todoLists.slice();
-    let todoListItem = updatedTodoList[currentListKey].items.find(
-      x => x.id === id
-    );
-    for (let value in updatedTodoItem)
-      todoListItem[value] = updatedTodoItem[value];
-    /////////////////////
-    const updatedCurrentList = Object.assign({}, this.state.currentList);
-    let listItem = updatedCurrentList.items.find(x => x.id === id);
-    for (let value in updatedTodoItem) listItem[value] = updatedTodoItem[value];
+    const idxOfList = updatedTodoList.map(e => e.key).indexOf(currentListKey);
+    const listItems = updatedTodoList[idxOfList].items;
+    let maxItemKey;
+    if(listItems === undefined || listItems.length === 0) {
+      console.log("REACHED UNDEFINED MESSAGE")
+      maxItemKey = -1;
+    } else {
+      maxItemKey = Math.max.apply(Math, listItems.map(function(o) { return o.key; }));
+    }
+    const newItemKey = maxItemKey + 1;
+    const newTodoItem = { key: newItemKey, ...newItemFields };
+    listItems.push(newTodoItem);
     this.setState({
-      todoLists: updatedTodoList,
-      currentList: updatedCurrentList
+      todoLists: updatedTodoList
     });
+  }
 
+  editItem = updatedItemFields => {
+    for (let field in updatedItemFields) {
+      if (field !== "completed" && (updatedItemFields[field] === "" || !updatedItemFields[field]))
+      updatedItemFields[field] = "Unknown";
+    }
+    if(!this.todoItem) {
+      // create item & update todo list
+      this.createNewItem(updatedItemFields);
+    } else {
+        const { key } = this.todoItem;
+        const updatedTodoItem = { key, ...updatedItemFields };
+        const currentListKey = this.state.currentList.key;
+        const updatedTodoList = this.state.todoLists.slice();
+        const idxOfList = updatedTodoList.map(e => e.key).indexOf(currentListKey);
+        let todoListItem = updatedTodoList[idxOfList].items.find(
+          x => x.key === key
+        );
+        for (let value in updatedTodoItem)
+          todoListItem[value] = updatedTodoItem[value];
+
+        // const updatedCurrentList = Object.assign({}, this.state.currentList);
+        // let listItem = updatedCurrentList.items.find(x => x.key === key);
+        // for (let value in updatedTodoItem) listItem[value] = updatedTodoItem[value];
+
+        this.setState({
+          todoLists: updatedTodoList,
+          // currentList: updatedCurrentList
+        });
+      }
+      
     this.loadListFromItem();
   };
 
@@ -181,6 +275,23 @@ class App extends Component {
     });
     this.goHomeFromModal();
   };
+
+  createNewList = () => {
+    const newList = {
+      items: [],
+      key: this.state.todoLists.slice(-1)[0].key+1,
+      name: null,
+      owner: null
+    }
+    const updatedTodoList = this.state.todoLists.slice();
+    updatedTodoList.push(newList);
+    this.setState({ todoLists: updatedTodoList,  currentList: newList, currentScreen: AppScreen.LIST_SCREEN });  
+  }
+  
+  addNewItem = () => {
+    this.todoItem = null;
+    this.setState({ currentScreen: AppScreen.ITEM_SCREEN }); 
+  }
 
   sortTasksHeader = sortType => {
     // can further modularize code & avoid reuse later
@@ -221,14 +332,22 @@ class App extends Component {
     this.setState({ currentList: updatedCurrentList });
   };
 
+
+
   render() {
     switch (this.state.currentScreen) {
       case AppScreen.HOME_SCREEN:
         return (
-          <HomeScreen
-            loadList={this.loadList.bind(this)}
-            todoLists={this.state.todoLists}
-          />
+          <div 
+          onKeyDown={() => console.log("TEST")} 
+          tabIndex={0}>
+            <HomeScreen
+              loadList={this.loadList.bind(this)}
+              todoLists={this.state.todoLists}
+              createNewList={this.createNewList.bind(this)}
+            />
+
+          </div>
         );
       case AppScreen.LIST_SCREEN:
         return (
@@ -241,6 +360,8 @@ class App extends Component {
             sortTasksHeader={this.sortTasksHeader.bind(this)}
             moveUpBtn={this.moveUpBtn.bind(this)}
             moveDownBtn={this.moveDownBtn.bind(this)}
+            addNewItem={this.addNewItem.bind(this)}
+            addNameChangeTransaction={this.addNameChangeTransaction.bind(this)}
           />
         );
       case AppScreen.ITEM_SCREEN:

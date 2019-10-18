@@ -83,7 +83,8 @@ body {
 
 .list_item_card,
 .list_item_add_card,
-.list_item_header_card {
+.list_item_header_card,
+.list_item_create_new_item_container {
   position: relative;
   height: 50px;
   grid-row-gap: 0px;
@@ -157,6 +158,11 @@ body {
 .new_item_div_container {
   display: grid;
   grid-template-columns: 1fr auto;
+}
+
+.list_item_create_new_item_container {
+  display: flex;
+  justify-content: space-around;
 }
 
 /* ITEM SCREEN CONTROLS */

@@ -4,21 +4,24 @@ import PropTypes from "prop-types";
 export class ItemScreen extends Component {
   constructor(props) {
     super(props);
-    const {
-      assigned_to,
-      completed,
-      description,
-      due_date
-    } = this.props.todoItem;
-    this.state = {
-      assigned_to,
-      completed,
-      description,
-      due_date
-    };
+    let assigned_to, completed, description, due_date;
+    if(this.props.todoItem) {
+      // if edit item, not add item
+      ({assigned_to, completed, description, due_date} = this.props.todoItem);
+    } else {
+      // if add item
+      completed = false; // just incase user left it null
+    }
+        this.state = {
+          assigned_to,
+          completed,
+          description,
+          due_date
+        };
 
     this.handleInputChange = this.handleInputChange.bind(this);
   }
+
 
   handleInputChange = event => {
     const target = event.target;
@@ -33,6 +36,12 @@ export class ItemScreen extends Component {
   submitChanges = () => {};
 
   render() {
+    console.log("IN ITEM SCREEN");
+    console.log("STATE (ITEM SCREEN)");
+    console.log(this.state)
+    console.log("PROPS (ITEM SCREEN)");
+    console.log(this.props)
+
     const { assigned_to, completed, description, due_date } = this.state;
     const { loadListFromItem, editItem } = this.props;
     return (
@@ -114,6 +123,7 @@ export class ItemScreen extends Component {
               value="Submit"
               name="submit"
               onClick={() => editItem(this.state)}
+              // onClick={() => console.log(editItem)}
             />
             <input
               type="submit"
@@ -130,8 +140,7 @@ export class ItemScreen extends Component {
 }
 
 ItemScreen.propTypes = {
-  currentScreen: PropTypes.string.isRequired,
-  todoItem: PropTypes.object.isRequired
+  currentScreen: PropTypes.string.isRequired
 };
 
 export default ItemScreen;

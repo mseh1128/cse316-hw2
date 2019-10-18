@@ -3,6 +3,7 @@ import ListHeading from "./ListHeading";
 import ListItemsTable from "./ListItemsTable";
 import PropTypes from "prop-types";
 import ListTrash from "./ListTrash";
+import addItemIcon from "../../images/AddItem.png";
 
 export class ListScreen extends Component {
   constructor(props) {
@@ -12,6 +13,8 @@ export class ListScreen extends Component {
       listOwner: this.getListOwner()
     };
     this.handleChange = this.handleChange.bind(this);
+    this.oldString = "";
+    this.newString = "";
   }
 
   handleChange(event) {
@@ -39,8 +42,16 @@ export class ListScreen extends Component {
     }
   }
 
+  handleOutFocus() {
+    
+    this.oldString = this.newString;
+    this.newString = this.state.listName;
+    this.props.addNameChangeTransaction(this.oldString, this.newString);
+  }
+
   render() {
     const { listName, listOwner } = this.state;
+    const {addNewItem} = this.props;
     return (
       <div id="todo_list">
         <ListHeading goHome={() => this.props.goHome(listName, listOwner)} />
@@ -54,6 +65,7 @@ export class ListScreen extends Component {
               type="text"
               id="list_name_textfield"
               onChange={this.handleChange}
+              onBlur={this.handleOutFocus.bind(this)}
             />
           </div>
           <div id="list_details_owner_container" className="text_toolbar">
@@ -75,6 +87,13 @@ export class ListScreen extends Component {
           moveDownBtn={this.props.moveDownBtn}
           goToItem={this.props.goToItem}
         />
+        <div className="list_item_create_new_item_container" onClick={addNewItem}>
+        <img
+        src={addItemIcon}
+        alt="Add New Item"
+        className="list_item_add_card"
+      />
+        </div>
       </div>
     );
   }
