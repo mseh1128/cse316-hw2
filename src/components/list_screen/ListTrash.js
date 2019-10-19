@@ -1,6 +1,6 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 
-import ListModal from "./ListModal";
+import ListModal from './ListModal';
 
 export class ListTrash extends Component {
   constructor(props) {

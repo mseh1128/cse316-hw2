@@ -210,4 +210,4 @@ module.exports = class jTPS {
     }
     return text;
   }
-}
+};

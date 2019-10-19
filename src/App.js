@@ -1,15 +1,16 @@
-import React, { Component } from "react";
-import testTodoListData from "./TestTodoListData.json";
-import HomeScreen from "./components/home_screen/HomeScreen";
-import ItemScreen from "./components/item_screen/ItemScreen";
-import ListScreen from "./components/list_screen/ListScreen";
-import jTPS from "./jtps/jTPS";
-import StrTransaction from "./jtps/AddToStr_Transaction"
+import React, { Component } from 'react';
+import testTodoListData from './TestTodoListData.json';
+import HomeScreen from './components/home_screen/HomeScreen';
+import ItemScreen from './components/item_screen/ItemScreen';
+import ListScreen from './components/list_screen/ListScreen';
+import jTPS from './jtps/jTPS';
+import StrTransaction from './jtps/AddToStr_Transaction';
+import Str from './jtps/Str';
 
 const AppScreen = {
-  HOME_SCREEN: "HOME_SCREEN",
-  LIST_SCREEN: "LIST_SCREEN",
-  ITEM_SCREEN: "ITEM_SCREEN"
+  HOME_SCREEN: 'HOME_SCREEN',
+  LIST_SCREEN: 'LIST_SCREEN',
+  ITEM_SCREEN: 'ITEM_SCREEN'
 };
 
 class App extends Component {
@@ -19,7 +20,7 @@ class App extends Component {
     currentList: null
   };
 
-  transactionSystem = new jTPS();
+  tps = new jTPS();
 
   todoItem = null;
 
@@ -41,59 +42,52 @@ class App extends Component {
     ctrl: false,
     z: false,
     y: false
+  };
+
+  componentDidMount() {
+    document.addEventListener('keydown', this.handleKeyDown);
+    document.addEventListener('keyup', this.handleKeyUp);
   }
 
-  componentDidMount(){
-    document.addEventListener("keydown", this.handleKeyDown);
-    document.addEventListener("keyup", this.handleKeyUp);
-  }
-  
-  componentWillUnmount(){
-    document.removeEventListener("keydown", this.handleKeyUp);
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.handleKeyUp);
   }
 
-  handleKeyDown = (event) => {
+  handleKeyDown = event => {
     if (event.keyCode === 90) {
-        this.keys["z"] = true;
+      this.keys['z'] = true;
     } else if (event.keyCode === 17) {
-        this.keys["ctrl"] = true;
-    } else if(event.keyCode === 89) {
-        this.keys["y"] = true;
+      this.keys['ctrl'] = true;
+    } else if (event.keyCode === 89) {
+      this.keys['y'] = true;
     }
-    if (this.keys["z"] && this.keys["ctrl"]) {
-      console.log("Z AND CTRL WERE BOTH CLICKED AT THE SAME TIME ")
-      this.transactionSystem.undoTransaction();
-      // do something here! 
-    } else if(this.keys["y"] && this.keys["ctrl"]) {
-      console.log("Y AND CTRL WERE BOTH CLICKED AT THE SAME TIME ")
-      this.transactionSystem.redoTransaction();
-       // do something here!
-    } 
-  }
+    if (this.keys['z'] && this.keys['ctrl']) {
+      console.log('Z AND CTRL WERE BOTH CLICKED AT THE SAME TIME ');
+      this.tps.undoTransaction();
+      console.log(this.tps);
+      // do something here!
+    } else if (this.keys['y'] && this.keys['ctrl']) {
+      console.log('Y AND CTRL WERE BOTH CLICKED AT THE SAME TIME ');
+      this.tps.doTransaction();
+      console.log(this.tps);
+      // do something here!
+    }
+  };
 
-  handleKeyUp = (event) => {
+  handleKeyUp = event => {
     if (event.keyCode === 90) {
-      this.keys["z"] = false;
+      this.keys['z'] = false;
     } else if (event.keyCode === 17) {
-      this.keys["ctrl"] = false;
+      this.keys['ctrl'] = false;
     }
-  }
+  };
 
-  addNameChangeTransaction = (oldStr, newStr) => {
-    const transaction = new StrTransaction(oldStr, newStr);
-    this.transactionSystem.addTransaction(transaction);
-    console.log(this.transactionSystem);
-  }
-
-  undoNameChangeTransaction = (oldStr, newStr) => {
-    const transaction = new StrTransaction(oldStr, newStr);
-    this.transactionSystem.addTransaction(transaction);
-  }
-
-  redoNameChangeTransaction = (oldStr, newStr) => {
-    const transaction = new StrTransaction(oldStr, newStr);
-    this.transactionSystem.addTransaction(transaction);
-  }
+  addStrChangeTransaction = (oldStr, newStr) => {
+    let oldStrObj = new Str();
+    oldStrObj.setStr(oldStr);
+    const transaction = new StrTransaction(oldStrObj, newStr);
+    this.tps.addTransaction(transaction);
+  };
 
   dueDateSortComparator = (a, b) => {
     if (new Date(a.due_date) > new Date(b.due_date)) {
@@ -156,13 +150,13 @@ class App extends Component {
     const currentListKey = this.state.currentList.key;
     const updatedTodoList = this.state.todoLists.slice();
     const idxOfList = updatedTodoList.map(e => e.key).indexOf(currentListKey);
-    if (newName === "" || newName === null) {
-      updatedTodoList[idxOfList].name = "Unknown";
+    if (newName === '' || newName === null) {
+      updatedTodoList[idxOfList].name = 'Unknown';
     } else {
       updatedTodoList[idxOfList].name = newName;
     }
-    if (newOwner === "" || newName === null) {
-      updatedTodoList[idxOfList].owner = "Unknown";
+    if (newOwner === '' || newName === null) {
+      updatedTodoList[idxOfList].owner = 'Unknown';
     } else {
       updatedTodoList[idxOfList].owner = newOwner;
     }
@@ -189,11 +183,12 @@ class App extends Component {
   loadListFromItem = () => {
     this.setState({ currentScreen: AppScreen.LIST_SCREEN });
     const currentListKey = this.state.currentList.key;
-    const idxOfList = this.state.todoLists.map(e => e.key).indexOf(currentListKey);
+    const idxOfList = this.state.todoLists
+      .map(e => e.key)
+      .indexOf(currentListKey);
     const currentListUpdated = this.state.todoLists[idxOfList];
     this.setState({ currentList: currentListUpdated });
   };
-
 
   createNewItem = newItemFields => {
     // requires currentlist to be defined
@@ -202,11 +197,16 @@ class App extends Component {
     const idxOfList = updatedTodoList.map(e => e.key).indexOf(currentListKey);
     const listItems = updatedTodoList[idxOfList].items;
     let maxItemKey;
-    if(listItems === undefined || listItems.length === 0) {
-      console.log("REACHED UNDEFINED MESSAGE")
+    if (listItems === undefined || listItems.length === 0) {
+      console.log('REACHED UNDEFINED MESSAGE');
       maxItemKey = -1;
     } else {
-      maxItemKey = Math.max.apply(Math, listItems.map(function(o) { return o.key; }));
+      maxItemKey = Math.max.apply(
+        Math,
+        listItems.map(function(o) {
+          return o.key;
+        })
+      );
     }
     const newItemKey = maxItemKey + 1;
     const newTodoItem = { key: newItemKey, ...newItemFields };
@@ -214,38 +214,41 @@ class App extends Component {
     this.setState({
       todoLists: updatedTodoList
     });
-  }
+  };
 
   editItem = updatedItemFields => {
     for (let field in updatedItemFields) {
-      if (field !== "completed" && (updatedItemFields[field] === "" || !updatedItemFields[field]))
-      updatedItemFields[field] = "Unknown";
+      if (
+        field !== 'completed' &&
+        (updatedItemFields[field] === '' || !updatedItemFields[field])
+      )
+        updatedItemFields[field] = 'Unknown';
     }
-    if(!this.todoItem) {
+    if (!this.todoItem) {
       // create item & update todo list
       this.createNewItem(updatedItemFields);
     } else {
-        const { key } = this.todoItem;
-        const updatedTodoItem = { key, ...updatedItemFields };
-        const currentListKey = this.state.currentList.key;
-        const updatedTodoList = this.state.todoLists.slice();
-        const idxOfList = updatedTodoList.map(e => e.key).indexOf(currentListKey);
-        let todoListItem = updatedTodoList[idxOfList].items.find(
-          x => x.key === key
-        );
-        for (let value in updatedTodoItem)
-          todoListItem[value] = updatedTodoItem[value];
+      const { key } = this.todoItem;
+      const updatedTodoItem = { key, ...updatedItemFields };
+      const currentListKey = this.state.currentList.key;
+      const updatedTodoList = this.state.todoLists.slice();
+      const idxOfList = updatedTodoList.map(e => e.key).indexOf(currentListKey);
+      let todoListItem = updatedTodoList[idxOfList].items.find(
+        x => x.key === key
+      );
+      for (let value in updatedTodoItem)
+        todoListItem[value] = updatedTodoItem[value];
 
-        // const updatedCurrentList = Object.assign({}, this.state.currentList);
-        // let listItem = updatedCurrentList.items.find(x => x.key === key);
-        // for (let value in updatedTodoItem) listItem[value] = updatedTodoItem[value];
+      // const updatedCurrentList = Object.assign({}, this.state.currentList);
+      // let listItem = updatedCurrentList.items.find(x => x.key === key);
+      // for (let value in updatedTodoItem) listItem[value] = updatedTodoItem[value];
 
-        this.setState({
-          todoLists: updatedTodoList,
-          // currentList: updatedCurrentList
-        });
-      }
-      
+      this.setState({
+        todoLists: updatedTodoList
+        // currentList: updatedCurrentList
+      });
+    }
+
     this.loadListFromItem();
   };
 
@@ -279,24 +282,28 @@ class App extends Component {
   createNewList = () => {
     const newList = {
       items: [],
-      key: this.state.todoLists.slice(-1)[0].key+1,
+      key: this.state.todoLists.slice(-1)[0].key + 1,
       name: null,
       owner: null
-    }
+    };
     const updatedTodoList = this.state.todoLists.slice();
     updatedTodoList.push(newList);
-    this.setState({ todoLists: updatedTodoList,  currentList: newList, currentScreen: AppScreen.LIST_SCREEN });  
-  }
-  
+    this.setState({
+      todoLists: updatedTodoList,
+      currentList: newList,
+      currentScreen: AppScreen.LIST_SCREEN
+    });
+  };
+
   addNewItem = () => {
     this.todoItem = null;
-    this.setState({ currentScreen: AppScreen.ITEM_SCREEN }); 
-  }
+    this.setState({ currentScreen: AppScreen.ITEM_SCREEN });
+  };
 
   sortTasksHeader = sortType => {
     // can further modularize code & avoid reuse later
     const updatedCurrentList = Object.assign({}, this.state.currentList);
-    if (sortType === "task") {
+    if (sortType === 'task') {
       if (this.taskAscending) {
         updatedCurrentList.items.sort((a, b) => this.taskSortComparator(a, b));
       } else {
@@ -305,7 +312,7 @@ class App extends Component {
           .reverse();
       }
       this.taskAscending = !this.taskAscending;
-    } else if (sortType === "due_date") {
+    } else if (sortType === 'due_date') {
       if (this.dueDateAscending) {
         updatedCurrentList.items.sort((a, b) =>
           this.dueDateSortComparator(a, b)
@@ -332,21 +339,16 @@ class App extends Component {
     this.setState({ currentList: updatedCurrentList });
   };
 
-
-
   render() {
     switch (this.state.currentScreen) {
       case AppScreen.HOME_SCREEN:
         return (
-          <div 
-          onKeyDown={() => console.log("TEST")} 
-          tabIndex={0}>
+          <div onKeyDown={() => console.log('TEST')} tabIndex={0}>
             <HomeScreen
               loadList={this.loadList.bind(this)}
               todoLists={this.state.todoLists}
               createNewList={this.createNewList.bind(this)}
             />
-
           </div>
         );
       case AppScreen.LIST_SCREEN:
@@ -361,7 +363,7 @@ class App extends Component {
             moveUpBtn={this.moveUpBtn.bind(this)}
             moveDownBtn={this.moveDownBtn.bind(this)}
             addNewItem={this.addNewItem.bind(this)}
-            addNameChangeTransaction={this.addNameChangeTransaction.bind(this)}
+            addStrChangeTransaction={this.addStrChangeTransaction.bind(this)}
           />
         );
       case AppScreen.ITEM_SCREEN:

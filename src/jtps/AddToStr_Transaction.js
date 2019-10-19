@@ -1,4 +1,4 @@
-import jTPS_Transaction from './jTPS_Transaction'
+import jTPS_Transaction from './jTPS_Transaction';
 
 class AddToStr_Transaction extends jTPS_Transaction {
   /**
@@ -13,13 +13,18 @@ class AddToStr_Transaction extends jTPS_Transaction {
     super();
     this.str = initStr;
     this.strToSwap = initNewStr; // will swap b/w new & old vals
+    this.flag = 0;
   }
 
   /**
    * This transaction simply adds the char to the str.
    */
   doTransaction() {
-    this.swapStrings(this.str, this.strToSwap);
+    if (this.flag !== 0) {
+      this.swapStrings(this.str, this.strToSwap);
+    } else {
+      this.flag = 1;
+    }
   }
 
   /**
@@ -30,11 +35,10 @@ class AddToStr_Transaction extends jTPS_Transaction {
   }
 
   swapStrings(str1, str2) {
-    const tStr = str1;
-    str1 = str2;
-    str2 = tStr;
+    const tStr = str1.getStr();
+    str1.setStr(str2.getStr());
+    str2.setStr(tStr);
   }
 }
 
 export default AddToStr_Transaction;
-
